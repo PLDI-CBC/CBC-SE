@@ -112,14 +112,10 @@ After execution, you can find the generated *csv* files in <u>/home/benchmarks/C
 
 ```
 # cd /home/benchmark/CVE
-# python3 init.py
+# python3 init.py clean
 ```
 
 Delete the parameter *`clean`* if you want to keep the intermediate result.
-
-> Note:  
->
-> The intermediate results are stored in the /home/results/CVE/libtasn1 directory. It's important to note that the table only includes the execution time and paths. Whether bugs were found within that time frame needs to be checked in the corresponding records at /home/results/CVE/libtasn1/CVE-XXXX-XXXX/CBC(KLEE)/*.log.
 
 ### To run the **Coreutils** experiment
 
