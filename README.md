@@ -9,8 +9,8 @@ Follow these links for installation instructions on [Ubuntu](https://docs.docker
 We have packaged all the environment and configuration related to the experiment into a docker image and uploaded it to the *DockerHub*. The only thing you need to do is pull it to your local machine.
 
 ```
-$ docker pull pldicbc/cbc:v1
-$ docker run --rm -ti --ulimit='stack=-1:-1' pldicbc/cbc:v1
+# docker pull pldicbc/cbc:v1
+# docker run --rm -ti --ulimit='stack=-1:-1' pldicbc/cbc:v1
 ```
 
 You can now try running CBC inside the container, by the way our image is based on ubuntu18.04. The version of llvm and clang is 6.0.0. If this worked correctly you should see an output similar to:
@@ -92,6 +92,19 @@ After execution, you can find the generated *csv* files in <u>/home/benchmarks/S
 ```
 
 ### To run the **CVE** experiment
+
+#### chopper
+
+Due to the older versions of KLEE and LLVM used by Chopper, we have provided another image to facilitate the replication of Chopper's experiments.
+
+```
+# docker pull pldicbc/chopper:v1
+# docker run --rm -ti --ulimit='stack=-1:-1' pldicbc/chopper:v1
+```
+
+How to rerun chopper experiments is available [Chopper -Software Reliability Group (ic.ac.uk)](https://srg.doc.ic.ac.uk/projects/chopper/artifact.html).
+
+#### CBC
 
 ***This experiment will require approximately 24 hours***
 
