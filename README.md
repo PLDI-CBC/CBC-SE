@@ -9,8 +9,8 @@ Follow these links for installation instructions on [Ubuntu](https://docs.docker
 We have packaged all the environment and configuration related to the experiment into a docker image and uploaded it to the *DockerHub*. The only thing you need to do is pull it to your local machine.
 
 ```
-$ docker pull cbc/pldi_2024:v1
-$ docker run --rm -ti --ulimit='stack=-1:-1' cbc/pldi_2024:v1
+$ docker pull pldicbc/cbc:v1
+$ docker run --rm -ti --ulimit='stack=-1:-1' pldicbc/cbc:v1
 ```
 
 You can now try running CBC inside the container, by the way our image is based on ubuntu18.04. The version of llvm and clang is 6.0.0. If this worked correctly you should see an output similar to:
@@ -78,16 +78,35 @@ If you wish to run the experiment, you can directly execute the following comman
 
 If you want to keep the intermediate result, delete the parameter *`clean`*, but we recommend keeping the 'clean' option, as the generated intermediate files are large. After execution, the final result will be saved to  CSV files and pictures, so there's no need to worry.
 
-By the way, to save time on reproducing experiments, we have **stored the results from the latest run** in the container as a reference. Also, we highly recommend **parallelizing the implementation** to reduce time overhead, depending on the performance of your setup.
+By the way, to expedite experiment reproduction, we have **archived the outcomes of the most recent run** within the container for reference. Moreover, we strongly advocate **implementing parallelization** to mitigate time overhead, tailored to the performance of your setup.
 
 ### To run the **SIR** experiment
 
 ***This experiment will require approximately 12 hours***
 
+After execution, you can find the generated *csv* files in <u>/home/benchmarks/SIR</u>.
+
 ```
 # cd /home/benchmark/SIR
 # python3 init.py clean
 ```
+
+### To run the **CVE** experiment
+
+***This experiment will require approximately 24 hours***
+
+After execution, you can find the generated *csv* files in <u>/home/benchmarks/CVE</u>. `CSV_results.csv` represents the comprehensive summary of all CVE results.
+
+```
+# cd /home/benchmark/CVE
+# python3 init.py
+```
+
+Delete the parameter *`clean`* if you want to keep the intermediate result.
+
+> Note:  
+>
+> The intermediate results are stored in the /home/results/CVE/libtasn1 directory. It's important to note that the table only includes the execution time and paths. Whether bugs were found within that time frame needs to be checked in the corresponding records at /home/results/CVE/libtasn1/CVE-XXXX-XXXX/CBC(KLEE)/*.log.
 
 ### To run the **Coreutils** experiment
 
@@ -107,9 +126,9 @@ To run all three experiments, you can directly execute the following command.
 
 #### Table3
 
-To get Table 3, you can execute the following command.
-
 ***This experiment will require approximately 100 hours***
+
+To get Table 3, you can execute the following command. After execution, you can find the generated CSV files in <u>/home/benchmarks/Coreutils/Table3/csvDir</u>.
 
 ```
 # python3 init.py exe1 clean
@@ -117,9 +136,9 @@ To get Table 3, you can execute the following command.
 
 #### Fig5
 
-To get Fig 5, you can execute the following command.
-
 ***This experiment will require approximately 384 hours***
+
+To get Fig 5, you can execute the following command. After execution, you can find the generated *pic* files in <u>/home/benchmarks/Coreutils/Fig5/picDir</u>.
 
 ```
 # python3 init.py exe2 clean
@@ -127,9 +146,9 @@ To get Fig 5, you can execute the following command.
 
 #### Fig6
 
-To get Fig 6, you can execute the following command.
-
 ***This experiment will require approximately 24 hours***
+
+To get Fig 6, you can execute the following command. After execution, you can find the generated *pic* files in <u>/home/benchmarks/Coreutils/Fig6/picDir</u>.
 
 ```
 # python3 init.py exe3 clean
@@ -137,13 +156,7 @@ To get Fig 6, you can execute the following command.
 
 Delete the parameter *`clean`* if you want to keep the intermediate result.
 
-### To run the **CVE** experiment
+> NOTE:
+>
+> Due to the adoption of a random search strategy, discrepancies between the experimental results and the paper data are expected.
 
-***This experiment will require approximately 24 hours***
-
-```
-# cd /home/benchmark/CVE
-# python3 init.py clean
-```
-
-Delete the parameter *`clean`* if you want to keep the intermediate result.
