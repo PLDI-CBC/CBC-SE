@@ -1,10 +1,9 @@
 # PLDI2024-CBC
 
-## Installing Docker
+## Docker build
 
 Follow these links for installation instructions on [Ubuntu](https://docs.docker.com/engine/install/ubuntu/), [OS X](https://docs.docker.com/installation/mac/) and [Windows](https://docs.docker.com/installation/windows/).
 
-## Getting Started 
 
 We have packaged all the environment and configuration related to the experiment into a docker image and uploaded it to the *DockerHub*. The only thing you need to do is pull it to your local machine.
 
@@ -13,23 +12,13 @@ We have packaged all the environment and configuration related to the experiment
 # docker run --rm -ti --ulimit='stack=-1:-1' pldicbc/cbc:v1
 ```
 
-You can now try running CBC inside the container, by the way our image is based on ubuntu18.04. The version of llvm and clang is 6.0.0. If this worked correctly you should see an output similar to:
+## Source build
+
+You can build all the tools by executing the following shell script.
 
 ```
-# clang -v
-clang version 6.0.0-1ubuntu2 (tags/RELEASE_600/final)
-Target: x86_64-pc-linux-gnu
-Thread model: posix
-InstalledDir: /usr/bin
-Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/7
-Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0
-Found candidate GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/8
-Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/7
-Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/7.5.0
-Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/8
-Selected GCC installation: /usr/bin/../lib/gcc/x86_64-linux-gnu/7.5.0
-Candidate multilib: .;@m64
-Selected multilib: .;@m64
+# chmod +x set-up.sh
+# bash set-up.sh
 ```
 
 ## Experiment replay
