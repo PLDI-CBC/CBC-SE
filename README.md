@@ -23,10 +23,10 @@ You can build all the tools by executing the following shell script.
 
 ## Experiment replay
 
-We designed three experiments to verify the effectiveness of CBC. For the experiment of reproduction, you can go to the ```/home``` directory, and experimental-related tools, as well as benchmarks, are available under the fold.
+We designed three experiments to verify the effectiveness of CBC. For the experiment of reproduction, you can go to the ```CBC-SE``` directory, and experimental-related tools, as well as benchmarks, are available under the fold.
 
 ```
-# cd /home
+# cd CBC-SE
 # tree -L 1
 |-- CBC          // Directory for CBC code
 |-- DGSE         // Directory for DGSE code
@@ -41,7 +41,7 @@ We designed three experiments to verify the effectiveness of CBC. For the experi
 The benchmark directory contains all experiments relevant to the work described in this paper.
 
 ```
-# cd /home/benchmark/
+# cd CBC-SE/benchmark/
 # tree -L 1
 |-- CVE             // CVE experiment(Table 2) 
 	|-- init.py
@@ -73,10 +73,10 @@ By the way, to expedite experiment reproduction, we have **archived the outcomes
 
 ***This experiment will require approximately 12 hours***
 
-After execution, you can find the generated *csv* files in <u>/home/benchmarks/SIR</u>.
+After execution, you can find the generated *csv* files in <u>CBC-SE/benchmarks/SIR</u>.
 
 ```
-# cd /home/benchmark/SIR
+# cd CBC-SE/benchmark/SIR
 # python3 init.py clean
 ```
 
@@ -97,10 +97,10 @@ How to rerun chopper experiments is available [Chopper -Software Reliability Gro
 
 ***This experiment will require approximately 24 hours***
 
-After execution, you can find the generated *csv* files in <u>/home/benchmarks/CVE</u>. `CSV_results.csv` represents the comprehensive summary of all CVE results.
+After execution, you can find the generated *csv* files in <u>CBC-SE/benchmarks/CVE</u>. `CSV_results.csv` represents the comprehensive summary of all CVE results.
 
 ```
-# cd /home/benchmark/CVE
+# cd CBC-SE/benchmark/CVE
 # python3 init.py clean
 ```
 
@@ -109,7 +109,7 @@ Delete the parameter *`clean`* if you want to keep the intermediate result.
 ### To run the **Coreutils** experiment
 
 ```
-# cd /home/benchmark/Coreutils
+# cd CBC-SE/benchmark/Coreutils
 ```
 
 #### All Experiments
@@ -126,7 +126,7 @@ To run all three experiments, you can directly execute the following command.
 
 ***This experiment will require approximately 100 hours***
 
-To get Table 3, you can execute the following command. After execution, you can find the generated CSV files in <u>/home/benchmarks/Coreutils/Table3/csvDir</u>.
+To get Table 3, you can execute the following command. After execution, you can find the generated CSV files in <u>CBC-SE/benchmarks/Coreutils/Table3/csvDir</u>.
 
 ```
 # python3 init.py exe1 clean
@@ -136,7 +136,7 @@ To get Table 3, you can execute the following command. After execution, you can 
 
 ***This experiment will require approximately 384 hours***
 
-To get Fig 5, you can execute the following command. After execution, you can find the generated *pic* files in <u>/home/benchmarks/Coreutils/Fig5/picDir</u>.
+To get Fig 5, you can execute the following command. After execution, you can find the generated *pic* files in <u>CBC-SE/benchmarks/Coreutils/Fig5/picDir</u>.
 
 ```
 # python3 init.py exe2 clean
@@ -146,7 +146,7 @@ To get Fig 5, you can execute the following command. After execution, you can fi
 
 ***This experiment will require approximately 24 hours***
 
-To get Fig 6, you can execute the following command. After execution, you can find the generated *pic* files in <u>/home/benchmarks/Coreutils/Fig6/picDir</u>.
+To get Fig 6, you can execute the following command. After execution, you can find the generated *pic* files in <u>CBC-SE/benchmarks/Coreutils/Fig6/picDir</u>.
 
 ```
 # python3 init.py exe3 clean
