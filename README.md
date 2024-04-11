@@ -56,6 +56,11 @@ The benchmark directory contains all experiments relevant to the work described 
 ```
 
 ### To run the whole experiment
+Before run the experiments, you need to set the environment variable:
+```
+# cd CBC-SE
+# export CBC_DIR = $(PWD)
+```
 
 If you wish to run the experiment, you can directly execute the following command.
 
