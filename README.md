@@ -38,10 +38,10 @@ We designed three experiments to verify the effectiveness of CBC. For the experi
 `-- z3           // Directory for SMT solver
 ```
 
-The benchmark directory contains all experiments relevant to the work described in this paper.
+The benchmarks directory contains all experiments relevant to the work described in this paper.
 
 ```
-# cd CBC-SE/benchmark/
+# cd CBC-SE/benchmarks/
 # tree -L 1
 |-- CVE             // CVE experiment(Table 2) 
 	|-- init.py
@@ -81,7 +81,7 @@ By the way, to expedite experiment reproduction, we have **archived the outcomes
 After execution, you can find the generated *csv* files in <u>CBC-SE/benchmarks/SIR</u>.
 
 ```
-# cd CBC-SE/benchmark/SIR
+# cd CBC-SE/benchmarks/SIR
 # python3 init.py clean
 ```
 
@@ -105,7 +105,7 @@ How to rerun chopper experiments is available [Chopper -Software Reliability Gro
 After execution, you can find the generated *csv* files in <u>CBC-SE/benchmarks/CVE</u>. `CSV_results.csv` represents the comprehensive summary of all CVE results.
 
 ```
-# cd CBC-SE/benchmark/CVE
+# cd CBC-SE/benchmarks/CVE
 # python3 init.py clean
 ```
 
@@ -114,7 +114,7 @@ Delete the parameter *`clean`* if you want to keep the intermediate result.
 ### To run the **Coreutils** experiment
 
 ```
-# cd CBC-SE/benchmark/Coreutils
+# cd CBC-SE/benchmarks/Coreutils
 ```
 
 #### All Experiments
