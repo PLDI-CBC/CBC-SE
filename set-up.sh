@@ -1,8 +1,15 @@
 #!/bin/bash
 
+# Get the number of CPU cores
+cpu_cores=$(nproc)
+
+# Calculate half of the CPU cores (rounded down to the nearest integer)
+half_cpu_cores=$((cpu_cores / 2))
+
 # Function: Execute a command and check its execution result
 execute_command() {
     echo "Executing command: $*"
+    local half_cpu_cores=$(expr $half_cpu_cores + 0)
     "$@" || { echo "Command execution failed: $*"; exit 1; }
 }
 
@@ -16,15 +23,23 @@ install_python_package() {
     execute_command pip3 install "$@" || { echo "Python package installation failed: $*"; exit 1; }
 }
 
-# Function: Configure and make the project
-configure_and_make() {
+# Function: Configure, make, and install the project
+configure_make_install() {
     local build_dir="$1"
     local make_args="$2"
     shift 2
+
+    local job_count=$(echo "$make_args" | grep -oP '\b\d+\b' || echo "1")
+
+    if [[ $job_count -gt 0 ]]; then
+        make_args=$(echo "$make_args" | sed "s/-j $job_count//")
+        make_args="-j $job_count $make_args"
+    fi
+
     execute_command cd "$build_dir" || { echo "Failed to change directory to $build_dir"; exit 1; }
     execute_command rm -rf * || { echo "Failed to clean directory"; exit 1; }
     execute_command cmake "$@" || { echo "CMake configuration failed"; exit 1; }
-    execute_command make "$make_args" || { echo "Make failed"; exit 1; }
+    execute_command make $make_args || { echo "Make failed"; exit 1; }
     execute_command make install || { echo "Make install failed"; exit 1; }
 }
 
@@ -43,53 +58,42 @@ install_python_package sklearn xlwings matplotlib pillow pandas tabulate
 # Install Google performance tools library
 install_package libgoogle-perftools-dev
 
-# Move to the /home directory
-execute_command cd /home/ || { echo "Failed to change directory to /home"; exit 1; }
+# Move to the CBC-SE directory
+cbc_se_dir=$(pwd)  # Replace this with the actual path to your CBC-SE directory
+execute_command cd "$cbc_se_dir" || { echo "Failed to change directory to $cbc_se_dir"; exit 1; }
 
-# Unzip z3.zip
-execute_command unzip z3.zip || { echo "Failed to unzip z3.zip"; exit 1; }
+# Unzip all the required files
+execute_command unzip -o z3.zip || { echo "Failed to unzip z3.zip"; exit 1; }
+execute_command unzip -o KLEE.zip || { echo "Failed to unzip KLEE.zip"; exit 1; }
+execute_command unzip -o dg.zip || { echo "Failed to unzip dg.zip"; exit 1; }
+execute_command unzip -o DGSE.zip || { echo "Failed to unzip DGSE.zip"; exit 1; }
+execute_command unzip -o CBC.zip || { echo "Failed to unzip CBC.zip"; exit 1; }
 
-# Unzip KLEE.zip
-execute_command unzip KLEE.zip || { echo "Failed to unzip KLEE.zip"; exit 1; }
+# Clone klee-uclibc repository if it doesn't exist
+if [ ! -d "klee-uclibc" ]; then
+    execute_command git clone https://github.com/klee/klee-uclibc.git || { echo "Failed to clone klee-uclibc repository"; exit 1; }
+else
+    echo "klee-uclibc directory already exists, skipping cloning"
+fi
 
-# Unzip DG.zip
-execute_command unzip dg.zip || { echo "Failed to unzip dg.zip"; exit 1; }
-
-# Unzip DGSE.zip
-execute_command unzip DGSE.zip || { echo "Failed to unzip DGSE.zip"; exit 1; }
-
-# Unzip CBC.zip
-execute_command unzip CBC.zip || { echo "Failed to unzip CBC.zip"; exit 1; }
-
-# Unzip benchmarks.zip
-execute_command unzip benchmarks.zip || { echo "Failed to unzip benchmarks.zip"; exit 1; }
-
-# Unzip results.zip
-execute_command unzip results.zip || { echo "Failed to unzip results.zip"; exit 1; }
-
-# Clone klee-uclibc repository
-execute_command git clone https://github.com/klee/klee-uclibc.git || { echo "Failed to clone klee-uclibc repository"; exit 1; }
 
 # Move to the klee-uclibc directory
 execute_command cd klee-uclibc || { echo "Failed to change directory to klee-uclibc"; exit 1; }
 
 # Configure klee-uclibc and make LLVM library
 execute_command ./configure --make-llvm-lib || { echo "Failed to configure klee-uclibc"; exit 1; }
-execute_command make -j2 || { echo "Make failed for klee-uclibc"; exit 1; }
+execute_command make -j $half_cpu_cores || { echo "Make failed for klee-uclibc"; exit 1; }
 
-# Get the number of CPU cores and calculate half of them
-cpu_cores=$(nproc)
-half_cpu_cores=$((cpu_cores / 2))
+# Configure, make, and install z3
+configure_make_install "$cbc_se_dir/z3/build" "-j $half_cpu_cores" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ .. || { echo "Failed to configure, make, and install z3"; exit 1; }
 
-# Configure and make z3
-configure_and_make "z3/build" "-j $half_cpu_cores" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ .. || { echo "Failed to configure and make z3"; exit 1; }
 
-# Configure and make KLEE
-configure_and_make "KLEE/klee_build" "-j $half_cpu_cores" \
+# Configure, make, and install KLEE
+configure_make_install "$cbc_se_dir/KLEE/klee_build" "-j $half_cpu_cores" \
     -DENABLE_SOLVER_Z3=ON \
     -DENABLE_POSIX_RUNTIME=ON \
     -DENABLE_KLEE_UCLIBC=ON \
-    -DKLEE_UCLIBC_PATH=/home/klee-uclibc \
+    -DKLEE_UCLIBC_PATH=$cbc_se_dir/klee-uclibc \
     -DLLVM_CONFIG_BINARY=/usr/bin/llvm-config \
     -DLLVMCC=/usr/bin/clang \
     -DLLVMCXX=/usr/bin/clang++ \
@@ -97,19 +101,19 @@ configure_and_make "KLEE/klee_build" "-j $half_cpu_cores" \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DENABLE_UNIT_TESTS=OFF \
     -DENABLE_SYSTEM_TESTS=OFF \
-    -DDG_ROOT_DIR=/home/dg \
-    ../klee/ || { echo "Failed to configure and make KLEE"; exit 1; }
+    -DDG_ROOT_DIR=$cbc_se_dir/dg \
+    ../klee/ || { echo "Failed to configure, make, and install KLEE"; exit 1; }
 
-# Configure and make dg
-configure_and_make "DG/build" "-j $half_cpu_cores" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ .. || { echo "Failed to configure and make DG"; exit 1; }
+# Configure, make, and install DG
+configure_make_install "$cbc_se_dir/dg/build" "-j $half_cpu_cores" -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ .. || { echo "Failed to configure, make, and install DG"; exit 1; }
 
 # Enter DGSE/klee_build directory and make
-execute_command cd /home/DGSE/klee_build/ || { echo "Failed to change directory to /home/DGSE/klee_build/"; exit 1; }
-configure_and_make "." "-j $half_cpu_cores" \
+execute_command cd "$cbc_se_dir/DGSE/klee_build/" || { echo "Failed to change directory to $cbc_se_dir/DGSE/klee_build/"; exit 1; }
+configure_make_install "." "-j $half_cpu_cores" \
     -DENABLE_SOLVER_Z3=ON \
     -DENABLE_POSIX_RUNTIME=ON \
     -DENABLE_KLEE_UCLIBC=ON \
-    -DKLEE_UCLIBC_PATH=/home/klee-uclibc \
+    -DKLEE_UCLIBC_PATH=$cbc_se_dir/klee-uclibc \
     -DLLVM_CONFIG_BINARY=/usr/bin/llvm-config \
     -DLLVMCC=/usr/bin/clang \
     -DLLVMCXX=/usr/bin/clang++ \
@@ -117,16 +121,16 @@ configure_and_make "." "-j $half_cpu_cores" \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DENABLE_UNIT_TESTS=OFF \
     -DENABLE_SYSTEM_TESTS=OFF \
-    -DDG_ROOT_DIR=/home/dg \
-    ../klee/ || { echo "Failed to configure and make KLEE in /home/DGSE/klee_build/"; exit 1; }
+    -DDG_ROOT_DIR=$cbc_se_dir/dg \
+    ../klee/ || { echo "Failed to configure, make, and install KLEE in $cbc_se_dir/DGSE/klee_build/"; exit 1; }
 
 # Enter CBC/klee_build directory and make
-execute_command cd /home/CBC/klee_build/ || { echo "Failed to change directory to /home/CBC/klee_build/"; exit 1; }
-configure_and_make "." "-j $half_cpu_cores" \
+execute_command cd "$cbc_se_dir/CBC/klee_build/" || { echo "Failed to change directory to $cbc_se_dir/CBC/klee_build/"; exit 1; }
+configure_make_install "." "-j $half_cpu_cores" \
     -DENABLE_SOLVER_Z3=ON \
     -DENABLE_POSIX_RUNTIME=ON \
     -DENABLE_KLEE_UCLIBC=ON \
-    -DKLEE_UCLIBC_PATH=/home/klee-uclibc \
+    -DKLEE_UCLIBC_PATH=$cbc_se_dir/klee-uclibc \
     -DLLVM_CONFIG_BINARY=/usr/bin/llvm-config \
     -DLLVMCC=/usr/bin/clang \
     -DLLVMCXX=/usr/bin/clang++ \
@@ -134,5 +138,5 @@ configure_and_make "." "-j $half_cpu_cores" \
     -DCMAKE_CXX_COMPILER=clang++ \
     -DENABLE_UNIT_TESTS=OFF \
     -DENABLE_SYSTEM_TESTS=OFF \
-    -DDG_ROOT_DIR=/home/dg \
-    ../klee/ || { echo "Failed to configure and make CBC in /home/CBC/klee_build/"; exit 1; }
+    -DDG_ROOT_DIR=$cbc_se_dir/dg \
+    ../klee/ || { echo "Failed to configure, make, and install CBC in $cbc_se_dir/CBC/klee_build/"; exit 1; }
